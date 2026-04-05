@@ -26,7 +26,7 @@ const GITHUB_USER = "RaeesRaqeeb";
 const GITHUB_ORG = "GB-AI-Tutor";
 const USER_API_URL = `https://api.github.com/users/${GITHUB_USER}/repos?per_page=100`;
 const ORG_API_URL = `https://api.github.com/orgs/${GITHUB_ORG}/repos?per_page=100`;
-const MAX_REPOS = 9;
+const MAX_REPOS = 12;
 
 let allRepos = [];
 let currentSort = "stars";
