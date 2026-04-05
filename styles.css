@@ -526,6 +526,32 @@ ul {
   gap: 0.3rem;
 }
 
+.project-links {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: auto;
+}
+
+.project-live-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--btn-primary-bg);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: background var(--transition), transform var(--transition);
+}
+
+.project-live-link:hover {
+  background: var(--btn-primary-hover);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
 .project-link {
   display: inline-flex;
   align-items: center;
@@ -533,8 +559,6 @@ ul {
   color: var(--accent);
   font-size: 0.85rem;
   font-weight: 600;
-  margin-top: auto;
-  align-self: flex-start;
   transition: gap var(--transition);
 }
 

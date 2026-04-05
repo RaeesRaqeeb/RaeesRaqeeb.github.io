@@ -29,7 +29,7 @@ const ORG_API_URL = `https://api.github.com/orgs/${GITHUB_ORG}/repos?per_page=10
 const MAX_REPOS = 12;
 
 let allRepos = [];
-let currentSort = "stars";
+let currentSort = "updated";
 
 /* ── Fetch repos ───────────────────────────────────────────────── */
 async function fetchRepos() {
@@ -82,7 +82,13 @@ async function fetchRepos() {
 function renderRepos(sortBy) {
   const grid = document.getElementById("repo-list");
 
+  // Custom sort: Organization repos first, then by update date
   const sorted = [...allRepos].sort((a, b) => {
+    // Organization repos always come first
+    if (a.isOrgRepo && !b.isOrgRepo) return -1;
+    if (!a.isOrgRepo && b.isOrgRepo) return 1;
+    
+    // Within same category, sort by criteria
     if (sortBy === "stars") {
       return b.stargazers_count - a.stargazers_count;
     }
@@ -125,6 +131,13 @@ function buildCard(repo) {
     month: "short",
   });
 
+  // Add live link for organization repos
+  const liveLink = repo.isOrgRepo && repo.name.includes("gb-career-pilot")
+    ? `<a class="project-live-link" href="https://raqeebs.app" target="_blank" rel="noopener noreferrer">
+         🚀 Visit Live Site
+       </a>`
+    : "";
+
   return `
 <article class="project-card">
   <div class="project-header">
@@ -146,9 +159,12 @@ function buildCard(repo) {
     ${forks}
     <span title="Last updated">🕒 ${updated}</span>
   </div>
-  <a class="project-link" href="${repo.html_url}" target="_blank" rel="noopener noreferrer">
-    View on GitHub →
-  </a>
+  <div class="project-links">
+    ${liveLink}
+    <a class="project-link" href="${repo.html_url}" target="_blank" rel="noopener noreferrer">
+      View on GitHub →
+    </a>
+  </div>
 </article>`;
 }
 
