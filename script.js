@@ -23,7 +23,9 @@ const LANG_COLORS = {
 };
 
 const GITHUB_USER = "RaeesRaqeeb";
-const API_URL = `https://api.github.com/users/${GITHUB_USER}/repos?per_page=100`;
+const GITHUB_ORG = "GB-AI-Tutor";
+const USER_API_URL = `https://api.github.com/users/${GITHUB_USER}/repos?per_page=100`;
+const ORG_API_URL = `https://api.github.com/orgs/${GITHUB_ORG}/repos?per_page=100`;
 const MAX_REPOS = 9;
 
 let allRepos = [];
@@ -35,18 +37,36 @@ async function fetchRepos() {
   const errEl = document.getElementById("projects-error");
 
   try {
-    const res = await fetch(API_URL, {
-      headers: { Accept: "application/vnd.github+json" },
-    });
+    // Fetch both personal and organization repos in parallel
+    const [userRes, orgRes] = await Promise.all([
+      fetch(USER_API_URL, {
+        headers: { Accept: "application/vnd.github+json" },
+      }),
+      fetch(ORG_API_URL, {
+        headers: { Accept: "application/vnd.github+json" },
+      }),
+    ]);
 
-    if (!res.ok) {
-      throw new Error(`GitHub API returned ${res.status}`);
+    if (!userRes.ok) {
+      throw new Error(`GitHub API returned ${userRes.status} for user repos`);
+    }
+    if (!orgRes.ok) {
+      throw new Error(`GitHub API returned ${orgRes.status} for org repos`);
     }
 
-    const repos = await res.json();
+    const [userRepos, orgRepos] = await Promise.all([
+      userRes.json(),
+      orgRes.json(),
+    ]);
+
+    // Mark org repos with a badge
+    const markedOrgRepos = orgRepos.map((r) => ({ ...r, isOrgRepo: true }));
+
+    // Combine both arrays
+    const combinedRepos = [...userRepos, ...markedOrgRepos];
 
     /* exclude forks and the profile/pages repo itself */
-    allRepos = repos.filter(
+    allRepos = combinedRepos.filter(
       (r) => !r.fork && r.name !== `${GITHUB_USER}.github.io`
     );
 
@@ -90,6 +110,11 @@ function buildCard(repo) {
        </span>`
     : "";
 
+  // Add organization badge if it's an org repo
+  const orgBadge = repo.isOrgRepo
+    ? `<span class="org-badge" title="Organization project">🏢 GB-AI-Tutor</span>`
+    : "";
+
   const stars =
     `<span class="project-stars" title="Stars">⭐ ${repo.stargazers_count}</span>`;
   const forks =
@@ -102,15 +127,18 @@ function buildCard(repo) {
 
   return `
 <article class="project-card">
-  <h3 class="project-name">
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="var(--text-muted)" aria-hidden="true">
-      <path d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75
-        0 110-1.5h1.75v-2h-8a1 1 0 00-.714 1.7.75.75 0 01-1.072 1.05A2.495 2.495 0 012 11.5v-9zm10.5-1V9h-8c-.356
-        0-.694.074-1 .208V2.5a1 1 0 011-1h8zM5 12.25v3.25a.25.25 0 00.4.2l1.45-1.087a.25.25
-        0 01.3 0L8.6 15.7a.25.25 0 00.4-.2v-3.25a.25.25 0 00-.25-.25h-3.5a.25.25 0 00-.25.25z"/>
-    </svg>
-    ${escapeHtml(repo.name)}
-  </h3>
+  <div class="project-header">
+    <h3 class="project-name">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="var(--text-muted)" aria-hidden="true">
+        <path d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75
+          0 110-1.5h1.75v-2h-8a1 1 0 00-.714 1.7.75.75 0 01-1.072 1.05A2.495 2.495 0 012 11.5v-9zm10.5-1V9h-8c-.356
+          0-.694.074-1 .208V2.5a1 1 0 011-1h8zM5 12.25v3.25a.25.25 0 00.4.2l1.45-1.087a.25.25
+          0 01.3 0L8.6 15.7a.25.25 0 00.4-.2v-3.25a.25.25 0 00-.25-.25h-3.5a.25.25 0 00-.25.25z"/>
+      </svg>
+      ${escapeHtml(repo.name)}
+    </h3>
+    ${orgBadge}
+  </div>
   <p class="project-desc">${desc}</p>
   <div class="project-meta">
     ${langBadge}

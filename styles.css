@@ -457,6 +457,14 @@ ul {
   box-shadow: 0 8px 24px var(--accent-glow);
 }
 
+.project-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
 .project-name {
   font-size: 1.05rem;
   font-weight: 700;
@@ -464,6 +472,23 @@ ul {
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.org-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  background: var(--accent-glow);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .project-desc {
